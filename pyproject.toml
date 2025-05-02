@@ -1,0 +1,19 @@
+[project]
+name = "web-module-4"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "pradivliany",email = "yaroslavpradyvlianyi@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "black (>=25.1.0,<26.0.0)",
+    "mypy (>=1.15.0,<2.0.0)",
+    "flake8 (>=7.2.0,<8.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
