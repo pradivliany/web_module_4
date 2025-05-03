@@ -1,4 +1,5 @@
 import socket
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
 from urllib.parse import urlparse, unquote_plus
@@ -6,6 +7,15 @@ from pathlib import Path
 import mimetypes
 from datetime import datetime
 import json
+
+if not Path("/app/storage/data.json").exists():
+    if not Path("/app/storage/").exists():
+        Path("/app/storage/").mkdir(parents=True, exist_ok=True)
+    try:
+        with open("/app/storage/data.json", "w") as file:
+            json.dump({}, file)
+    except Exception as e:
+        print(f"Виникла помилка: {e}")
 
 
 WEB_PORT, UDP_PORT = 3000, 5000
@@ -18,14 +28,14 @@ class HTTPHandler(BaseHTTPRequestHandler):
         parsed_url = urlparse(self.path)
         match parsed_url.path:
             case "/":
-                self.send_html_file("index.html")
+                self.send_html_file("templates/index.html")
             case "/contact":
-                self.send_html_file("message.html")
+                self.send_html_file("templates/message.html")
             case _:
                 if Path(parsed_url.path[1:]).exists():
                     self.send_static()
                 else:
-                    self.send_html_file("error.html", 404)
+                    self.send_html_file("templates/error.html", 404)
 
     def send_html_file(self, filename, status=200):
         self.send_response(status)
@@ -80,8 +90,8 @@ def run_socket_server(ip, port):
             data_from_json_file[str(time_now)] = data_dict
 
             # записую в data.json новий вміст
-            with open("storage/data.json", "w") as json_file:
-                json.dump(data_from_json_file, json_file, indent=2)
+            with open("storage/data.json", "w", encoding="utf-8") as json_file:
+                json.dump(data_from_json_file, json_file, indent=2, ensure_ascii=False)
     except KeyboardInterrupt:
         print("Destroy server...")
     finally:
@@ -98,3 +108,5 @@ if __name__ == "__main__":
     # створюю і запускаю потік для сокет-серверу
     socket_server_thread = Thread(target=run_socket_server, args=[UDP_IP, UDP_PORT])
     socket_server_thread.start()
+
+    time.sleep(0.5)
